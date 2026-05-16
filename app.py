@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import pandas as pd
 import openpyxl
 from pathlib import Path
 
@@ -70,26 +69,38 @@ def compare(actual, predictions):
     return scores
 
 
-def build_dataframe(actual, predictions, scores):
-    rows = []
+
+def render_html_table(actual, predictions, scores):
+    names = list(predictions.keys())
+    header_cells = '<th>순위</th><th>실제</th>' + ''.join(f'<th>{n}</th>' for n in names)
+
+    rows_html = ''
     for i in range(20):
-        row = {'순위': i + 1, '실제': actual[i]}
-        for name, pred in predictions.items():
-            row[name] = pred[i]
-        rows.append(row)
-    return pd.DataFrame(rows)
+        rank = i + 1
+        act = actual[i]
+        bg = '#f9f9f9' if i % 2 == 0 else '#ffffff'
+        row = f'<td style="background:{bg};text-align:center">{rank}</td>'
+        row += f'<td style="background:{bg}">{act}</td>'
+        for name in names:
+            pred = predictions[name][i]
+            color = '#90EE90' if pred == act else '#FFB6B6'
+            row += f'<td style="background:{color}">{pred}</td>'
+        rows_html += f'<tr>{row}</tr>'
 
-
-def highlight(df):
-    style = pd.DataFrame('', index=df.index, columns=df.columns)
-    for i in df.index:
-        actual_team = df.at[i, '실제']
-        for name in PREDICTIONS:
-            if df.at[i, name] == actual_team:
-                style.at[i, name] = 'background-color: #90EE90; font-weight: bold'
-            else:
-                style.at[i, name] = 'background-color: #FFB6B6'
-    return style
+    return f"""
+    <style>
+      .pl-table-wrap {{ overflow-x: auto; -webkit-overflow-scrolling: touch; }}
+      .pl-table {{ border-collapse: collapse; width: 100%; min-width: 320px; font-size: 13px; }}
+      .pl-table th {{ background: #1E3A5F; color: white; padding: 8px 6px; text-align: center; position: sticky; top: 0; }}
+      .pl-table td {{ padding: 6px 8px; border-bottom: 1px solid #ddd; white-space: nowrap; }}
+    </style>
+    <div class="pl-table-wrap">
+      <table class="pl-table">
+        <thead><tr>{header_cells}</tr></thead>
+        <tbody>{rows_html}</tbody>
+      </table>
+    </div>
+    """
 
 
 # ── UI ────────────────────────────────────────────────────────
@@ -119,7 +130,4 @@ for col, (name, score) in zip(cols, scores.items()):
 st.divider()
 
 # 순위 표
-df = build_dataframe(actual, PREDICTIONS, scores)
-df_indexed = df.set_index('순위')
-styled = df_indexed.style.apply(highlight, axis=None)
-st.dataframe(styled, use_container_width=True, height=720)
+st.markdown(render_html_table(actual, PREDICTIONS, scores), unsafe_allow_html=True)
