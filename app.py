@@ -11,6 +11,7 @@ TEAM_NAME_KO = {
     'Aston Villa': '빌라',
     'Liverpool': '리버풀',
     'Bournemouth': '본머스',
+    'AFC Bournemouth': '본머스',
     'Brighton and Hove Albion': '브라이튼',
     'Brighton & Hove Albion': '브라이튼',
     'Brentford': '브랜트포드',
