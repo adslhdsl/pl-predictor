@@ -90,7 +90,7 @@ def render_html_table(actual, predictions, scores):
     return f"""
     <style>
       .pl-table-wrap {{ overflow-x: auto; -webkit-overflow-scrolling: touch; }}
-      .pl-table {{ border-collapse: collapse; width: 100%; min-width: 320px; font-size: 13px; }}
+      .pl-table {{ border-collapse: collapse; width: 100%; min-width: 320px; font-size: 11px; }}
       .pl-table th {{ background: #1E3A5F; color: white; padding: 8px 6px; text-align: center; position: sticky; top: 0; }}
       .pl-table td {{ padding: 6px 8px; border-bottom: 1px solid #ddd; white-space: nowrap; }}
     </style>
