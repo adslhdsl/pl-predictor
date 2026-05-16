@@ -72,11 +72,12 @@ def build_dataframe(actual, predictions, scores):
     return pd.DataFrame(rows)
 
 
-def highlight(df, actual, predictions):
+def highlight(df):
     style = pd.DataFrame('', index=df.index, columns=df.columns)
-    for i in range(20):
-        for name in predictions:
-            if predictions[name][i] == actual[i]:
+    for i in df.index:
+        actual_team = df.at[i, '실제']
+        for name in PREDICTIONS:
+            if df.at[i, name] == actual_team:
                 style.at[i, name] = 'background-color: #90EE90; font-weight: bold'
             else:
                 style.at[i, name] = 'background-color: #FFB6B6'
@@ -112,8 +113,5 @@ st.divider()
 # 순위 표
 df = build_dataframe(actual, PREDICTIONS, scores)
 df_indexed = df.set_index('순위')
-styled = df_indexed.style.apply(
-    lambda _: highlight(df, actual, PREDICTIONS).drop(columns=['순위', '실제']).values,
-    axis=None
-)
+styled = df_indexed.style.apply(highlight, axis=None)
 st.dataframe(styled, use_container_width=True, height=720)
