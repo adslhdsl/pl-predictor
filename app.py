@@ -121,11 +121,15 @@ scores = compare(actual, PREDICTIONS)
 winner = max(scores, key=scores.get)
 
 # 점수 카드
-cols = st.columns(len(PREDICTIONS))
-for col, (name, score) in zip(cols, scores.items()):
-    with col:
-        medal = '🏆' if name == winner else ''
-        st.metric(label=f'{medal} {name}', value=f'{score}개 적중')
+cards = ''
+for name, score in scores.items():
+    medal = '🏆 ' if name == winner else ''
+    cards += f'''
+    <div style="flex:1;text-align:center;padding:8px;background:#f0f2f6;border-radius:8px;margin:0 4px">
+      <div style="font-size:12px;color:#555">{medal}{name}</div>
+      <div style="font-size:16px;font-weight:bold">{score}개 적중</div>
+    </div>'''
+st.markdown(f'<div style="display:flex;margin-bottom:12px">{cards}</div>', unsafe_allow_html=True)
 
 st.divider()
 
