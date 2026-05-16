@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import pandas as pd
+import openpyxl
+from pathlib import Path
 
 TEAM_NAME_KO = {
     'Arsenal': '아스날',
@@ -26,14 +28,19 @@ TEAM_NAME_KO = {
     'Wolverhampton Wanderers': '울버햄튼',
 }
 
-PREDICTIONS = {
-    '성진': ['리버풀','맨시티','첼시','아스날','뉴캐슬','토트넘','맨유','브라이튼','빌라','풀럼',
-             '노팅엄','에버튼','크리스탈팰리스','웨스트햄','울버햄튼','본머스','브랜트포드','선더랜드','리즈','번리'],
-    '원기': ['아스날','리버풀','첼시','맨시티','빌라','뉴캐슬','맨유','크리스탈팰리스','브라이튼','풀럼',
-             '노팅엄','본머스','토트넘','에버튼','웨스트햄','울버햄튼','리즈','브랜트포드','번리','선더랜드'],
-    '규성': ['리버풀','맨시티','아스날','첼시','뉴캐슬','빌라','브랜트포드','브라이튼','번리','본머스',
-             '맨유','노팅엄','크리스탈팰리스','에버튼','토트넘','선더랜드','풀럼','울버햄튼','웨스트햄','리즈'],
-}
+def load_predictions():
+    path = Path(__file__).parent / 'predictions.xlsx'
+    wb = openpyxl.load_workbook(path)
+    ws = wb.active
+    rows = list(ws.iter_rows(values_only=True))
+    names = [h for h in rows[0] if h]
+    predictions = {name: [] for name in names}
+    for row in rows[1:]:
+        for idx, name in enumerate(names):
+            predictions[name].append(row[idx + 1])
+    return predictions
+
+PREDICTIONS = load_predictions()
 
 
 @st.cache_data(ttl=3600)
