@@ -311,6 +311,7 @@ st.markdown("""
   hr { border-color: rgba(255,255,255,0.07) !important; margin: 20px 0 !important; }
 
   .stSpinner > div { border-top-color: #7c3aed !important; }
+  .stButton { display: flex; justify-content: center; }
   .stAlert { border-radius: 12px !important; }
 
   /* Score grid: 항상 한 줄 */
