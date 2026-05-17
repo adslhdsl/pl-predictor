@@ -44,7 +44,7 @@ def load_predictions():
 PREDICTIONS = load_predictions()
 
 def get_logo_b64():
-    path = Path(__file__).parent / 'image' / 'PL_logo.png'
+    path = Path(__file__).parent / 'image' / 'PL_logo.gif'
     return base64.b64encode(path.read_bytes()).decode()
 
 LOGO_B64 = get_logo_b64()
@@ -376,7 +376,7 @@ st.markdown("""
 # ── Header ────────────────────────────────────────────────────
 st.markdown(f"""
 <div class="pl-header-wrap" style="text-align:center;padding:36px 0 24px">
-  <img src="data:image/png;base64,{LOGO_B64}"
+  <img src="data:image/gif;base64,{LOGO_B64}"
        style="width:72px;height:72px;object-fit:contain;margin-bottom:14px;
               filter:drop-shadow(0 4px 16px rgba(124,58,237,0.5));">
   <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:#7c3aed;text-transform:uppercase;margin-bottom:10px">
