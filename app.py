@@ -375,17 +375,17 @@ st.markdown("""
 
 # ── Header ────────────────────────────────────────────────────
 st.markdown(f"""
-<div class="pl-header-wrap" style="text-align:center;padding:36px 0 24px">
-  <img src="data:image/gif;base64,{LOGO_B64}"
-       style="width:288px;height:288px;object-fit:contain;margin-bottom:14px;
-              filter:drop-shadow(0 4px 16px rgba(124,58,237,0.5));">
-  <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:#7c3aed;text-transform:uppercase;margin-bottom:10px">
+<div class="pl-header-wrap" style="text-align:center;padding:16px 0 24px">
+  <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:#7c3aed;text-transform:uppercase;margin-bottom:8px">
     2025–26 SEASON
   </div>
-  <h1 class="pl-header-title" style="font-size:30px;font-weight:900;color:white;margin:0;letter-spacing:-0.5px;line-height:1.15">
+  <img src="data:image/gif;base64,{LOGO_B64}"
+       style="width:288px;height:288px;object-fit:contain;display:block;margin:0 auto;
+              filter:drop-shadow(0 4px 16px rgba(124,58,237,0.5));">
+  <h1 class="pl-header-title" style="font-size:30px;font-weight:900;color:white;margin:8px 0 0;letter-spacing:-0.5px;line-height:1.15">
     프리미어리그<br>순위 예측 대결
   </h1>
-  <div style="width:44px;height:3px;background:linear-gradient(90deg,#7c3aed,#a855f7);margin:16px auto 0;border-radius:99px"></div>
+  <div style="width:44px;height:3px;background:linear-gradient(90deg,#7c3aed,#a855f7);margin:14px auto 0;border-radius:99px"></div>
 </div>
 """, unsafe_allow_html=True)
 
