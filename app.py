@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 import openpyxl
-from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 TEAM_NAME_KO = {
@@ -68,61 +67,6 @@ def compare(actual, predictions):
     for name, pred in predictions.items():
         scores[name] = sum(1 for i in range(20) if pred[i] == actual[i])
     return scores
-
-
-KST = timezone(timedelta(hours=9))
-WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일']
-
-@st.cache_data(ttl=1800)
-def fetch_fixtures():
-    url = "https://site.api.espn.com/apis/v2/sports/soccer/eng.1/scoreboard"
-    resp = requests.get(url, timeout=10)
-    resp.raise_for_status()
-    data = resp.json()
-
-    fixtures = []
-    for event in data.get("events", []):
-        if event["status"]["type"]["state"] != "pre":
-            continue
-        comp = event["competitions"][0]
-        home = next(c for c in comp["competitors"] if c["homeAway"] == "home")
-        away = next(c for c in comp["competitors"] if c["homeAway"] == "away")
-        home_ko = TEAM_NAME_KO.get(home["team"]["displayName"], home["team"]["displayName"])
-        away_ko = TEAM_NAME_KO.get(away["team"]["displayName"], away["team"]["displayName"])
-        dt = datetime.fromisoformat(event["date"].replace("Z", "+00:00")).astimezone(KST)
-        date_str = f"{dt.month}/{dt.day}({WEEKDAYS[dt.weekday()]}) {dt.strftime('%H:%M')}"
-        fixtures.append((home_ko, away_ko, date_str))
-        if len(fixtures) >= 3:
-            break
-    return fixtures
-
-
-def render_fixtures_html(fixtures):
-    if not fixtures:
-        return ""
-    items = ""
-    for home, away, date_str in fixtures:
-        items += f"""
-        <div style="display:flex;align-items:center;justify-content:space-between;
-                    padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);flex:1;text-align:right">{home}</div>
-          <div style="margin:0 14px;text-align:center;flex-shrink:0">
-            <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:3px">{date_str}</div>
-            <div style="font-size:11px;font-weight:700;color:#7c3aed;letter-spacing:1px">VS</div>
-          </div>
-          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);flex:1;text-align:left">{away}</div>
-        </div>"""
-
-    return f"""
-    <div style="margin-top:24px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
-                  color:rgba(255,255,255,0.25);margin-bottom:10px;text-align:center">UPCOMING FIXTURES</div>
-      <div style="border-radius:14px;border:1px solid rgba(255,255,255,0.07);
-                  background:rgba(255,255,255,0.02);overflow:hidden;">
-        {items}
-      </div>
-    </div>
-    """
 
 
 def compute_analysis(actual, predictions):
@@ -525,13 +469,6 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
     st.markdown(render_html_table(actual, points, PREDICTIONS, scores), unsafe_allow_html=True)
-
-    try:
-        fixtures = fetch_fixtures()
-        if fixtures:
-            st.markdown(render_fixtures_html(fixtures), unsafe_allow_html=True)
-    except Exception:
-        pass
 
 with tab2:
     st.markdown(render_analysis_html(analysis, winner), unsafe_allow_html=True)
