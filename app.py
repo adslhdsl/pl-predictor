@@ -132,11 +132,45 @@ def render_html_table(actual, predictions, scores):
       }}
       .pl-table tr:last-child td {{ border-bottom: none; }}
       .pl-table tr:hover td {{ background: rgba(255,255,255,0.03) !important; }}
+
+      /* Sticky: 순위 컬럼 */
+      .pl-table th:nth-child(1),
+      .pl-table td:nth-child(1) {{
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        width: 40px;
+        min-width: 40px;
+      }}
+      /* Sticky: 실제순위 컬럼 */
+      .pl-table th:nth-child(2),
+      .pl-table td:nth-child(2) {{
+        position: sticky;
+        left: 40px;
+        z-index: 2;
+        border-right: 1px solid rgba(255,255,255,0.08);
+        min-width: 72px;
+      }}
+      /* Sticky 헤더는 z-index 한 단계 더 높게 */
+      .pl-table th:nth-child(1),
+      .pl-table th:nth-child(2) {{
+        z-index: 3;
+        background: #2d0046;
+      }}
+      /* Sticky body 셀 배경 (투명이면 뒤 내용이 비쳐 보임) */
+      .pl-table td:nth-child(1),
+      .pl-table td:nth-child(2) {{
+        background: #0d0b1a;
+      }}
+      .pl-table tr:hover td:nth-child(1),
+      .pl-table tr:hover td:nth-child(2) {{
+        background: #13102a !important;
+      }}
+
       .rank-num {{
         font-weight: 700;
         font-size: 11px;
         color: rgba(255,255,255,0.3) !important;
-        width: 36px;
       }}
       .rank-ucl  {{ color: #60a5fa !important; }}
       .rank-euro {{ color: #fbbf24 !important; }}
@@ -144,7 +178,7 @@ def render_html_table(actual, predictions, scores):
       .team-name {{
         font-weight: 600;
         text-align: left !important;
-        padding-left: 16px !important;
+        padding-left: 14px !important;
         color: rgba(255,255,255,0.92) !important;
       }}
       .hit {{
@@ -203,17 +237,32 @@ st.markdown("""
 
   .stSpinner > div { border-top-color: #7c3aed !important; }
   .stAlert { border-radius: 12px !important; }
+
+  /* Score grid: 한 줄 → 모바일에서 2열 자동 wrap */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 8px;
+  }
+
+  /* Mobile tweaks */
+  @media (max-width: 480px) {
+    .pl-header-title { font-size: 22px !important; }
+    .pl-header-wrap  { padding: 20px 0 16px !important; }
+    .score-grid { grid-template-columns: repeat(2, 1fr); }
+    .stButton > button { width: 100% !important; }
+  }
 </style>
 """, unsafe_allow_html=True)
 
 
 # ── Header ────────────────────────────────────────────────────
 st.markdown("""
-<div style="text-align:center;padding:36px 0 24px">
+<div class="pl-header-wrap" style="text-align:center;padding:36px 0 24px">
   <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:#7c3aed;text-transform:uppercase;margin-bottom:10px">
     2025–26 SEASON
   </div>
-  <h1 style="font-size:30px;font-weight:900;color:white;margin:0;letter-spacing:-0.5px;line-height:1.15">
+  <h1 class="pl-header-title" style="font-size:30px;font-weight:900;color:white;margin:0;letter-spacing:-0.5px;line-height:1.15">
     ⚽ 프리미어리그<br>순위 예측 대결
   </h1>
   <div style="width:44px;height:3px;background:linear-gradient(90deg,#7c3aed,#a855f7);margin:16px auto 0;border-radius:99px"></div>
@@ -270,7 +319,7 @@ st.markdown(f"""
 <div style="margin:8px 0 28px">
   <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
               color:rgba(255,255,255,0.25);margin-bottom:12px;text-align:center">SCOREBOARD</div>
-  <div style="display:flex;gap:8px">{cards_html}</div>
+  <div class="score-grid">{cards_html}</div>
 </div>
 """, unsafe_allow_html=True)
 
