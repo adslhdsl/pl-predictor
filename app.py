@@ -377,10 +377,10 @@ st.markdown("""
   <div style="font-size:10px;font-weight:700;letter-spacing:5px;color:#7c3aed;text-transform:uppercase;margin-bottom:6px">
     2025–26 Season
   </div>
-  <div style="font-size:15px;font-weight:600;letter-spacing:6px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:8px">
+  <div style="font-size:24px;font-weight:600;letter-spacing:6px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:8px">
     Premier League
   </div>
-  <div class="pl-header-title" style="font-size:32px;font-weight:900;color:white;letter-spacing:-0.5px;line-height:1.2">
+  <div class="pl-header-title" style="font-size:18px;font-weight:700;color:rgba(255,255,255,0.75);letter-spacing:2px;line-height:1.2">
     순위 예측 대결
   </div>
   <div style="width:40px;height:3px;background:linear-gradient(90deg,#7c3aed,#a855f7);margin:12px auto 0;border-radius:99px"></div>
