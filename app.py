@@ -311,7 +311,6 @@ st.markdown("""
   hr { border-color: rgba(255,255,255,0.07) !important; margin: 20px 0 !important; }
 
   .stSpinner > div { border-top-color: #7c3aed !important; }
-  .stButton { display: flex; justify-content: center; }
   .stAlert { border-radius: 12px !important; }
 
   /* Score grid: 항상 한 줄 */
@@ -372,8 +371,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-if st.button('🔄 현재 순위 불러오기'):
-    st.cache_data.clear()
+col_l, col_c, col_r = st.columns([1, 1, 1])
+with col_c:
+    if st.button('🔄 현재 순위 불러오기', use_container_width=True):
+        st.cache_data.clear()
 
 with st.spinner('순위 불러오는 중...'):
     try:
