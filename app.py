@@ -78,9 +78,9 @@ def render_html_table(actual, predictions, scores):
         rank = i + 1
         act = actual[i]
 
-        if rank <= 4:
+        if rank <= 5:
             rank_cls = 'rank-ucl'
-        elif rank <= 6:
+        elif rank <= 7:
             rank_cls = 'rank-euro'
         elif rank >= 18:
             rank_cls = 'rank-rel'
