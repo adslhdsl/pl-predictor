@@ -306,6 +306,11 @@ st.markdown("""
 
   #MainMenu, footer, header { visibility: hidden; }
 
+  /* Streamlit 기본 블록 패딩 제거 */
+  .block-container { padding-top: 1rem !important; }
+  .stMarkdown, .element-container { margin-bottom: 0 !important; }
+  .stMarkdown p { margin: 0 !important; }
+
   .stButton > button {
     background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
     color: white !important;
@@ -375,17 +380,17 @@ st.markdown("""
 
 # ── Header ────────────────────────────────────────────────────
 st.markdown(f"""
-<div class="pl-header-wrap" style="text-align:center;padding:16px 0 24px">
-  <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:#7c3aed;text-transform:uppercase;margin-bottom:8px">
+<div class="pl-header-wrap" style="text-align:center;padding:4px 0 12px">
+  <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:#7c3aed;text-transform:uppercase;margin-bottom:0">
     2025–26 SEASON
   </div>
   <img src="data:image/gif;base64,{LOGO_B64}"
-       style="width:288px;height:288px;object-fit:contain;display:block;margin:0 auto;
+       style="width:288px;height:288px;object-fit:contain;display:block;margin:-8px auto -8px;
               filter:drop-shadow(0 4px 16px rgba(124,58,237,0.5));">
-  <h1 class="pl-header-title" style="font-size:30px;font-weight:900;color:white;margin:8px 0 0;letter-spacing:-0.5px;line-height:1.15">
+  <h1 class="pl-header-title" style="font-size:30px;font-weight:900;color:white;margin:0;letter-spacing:-0.5px;line-height:1.15">
     프리미어리그<br>순위 예측 대결
   </h1>
-  <div style="width:44px;height:3px;background:linear-gradient(90deg,#7c3aed,#a855f7);margin:14px auto 0;border-radius:99px"></div>
+  <div style="width:44px;height:3px;background:linear-gradient(90deg,#7c3aed,#a855f7);margin:10px auto 0;border-radius:99px"></div>
 </div>
 """, unsafe_allow_html=True)
 
