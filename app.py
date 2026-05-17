@@ -373,14 +373,17 @@ st.markdown("""
 
 # ── Header ────────────────────────────────────────────────────
 st.markdown("""
-<div class="pl-header-wrap" style="text-align:center;padding:8px 0 20px">
-  <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:#7c3aed;text-transform:uppercase;margin-bottom:10px">
-    2025–26 SEASON
+<div style="text-align:center;padding:8px 0 20px">
+  <div style="font-size:10px;font-weight:700;letter-spacing:5px;color:#7c3aed;text-transform:uppercase;margin-bottom:6px">
+    2025–26 Season
   </div>
-  <h1 class="pl-header-title" style="font-size:30px;font-weight:900;color:white;margin:0;letter-spacing:-0.5px;line-height:1.15">
-    ⚽ 프리미어리그<br>순위 예측 대결
-  </h1>
-  <div style="width:44px;height:3px;background:linear-gradient(90deg,#7c3aed,#a855f7);margin:12px auto 0;border-radius:99px"></div>
+  <div style="font-size:15px;font-weight:600;letter-spacing:6px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:8px">
+    Premier League
+  </div>
+  <div class="pl-header-title" style="font-size:32px;font-weight:900;color:white;letter-spacing:-0.5px;line-height:1.2">
+    순위 예측 대결
+  </div>
+  <div style="width:40px;height:3px;background:linear-gradient(90deg,#7c3aed,#a855f7);margin:12px auto 0;border-radius:99px"></div>
 </div>
 """, unsafe_allow_html=True)
 
