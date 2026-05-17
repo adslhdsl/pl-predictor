@@ -124,6 +124,7 @@ def render_analysis_html(analysis, winner):
       .an-table th:last-child  {{ text-align:left;padding-left:12px; }}
       .an-table td {{ padding:13px 12px;border-bottom:1px solid rgba(255,255,255,0.04);
                       color:rgba(255,255,255,0.6);text-align:center;white-space:nowrap; }}
+      .an-table td:last-child {{ white-space:normal;word-break:keep-all;line-height:1.6; }}
       .an-table tr:last-child td {{ border-bottom:none; }}
       .an-table tr:hover td {{ background:rgba(255,255,255,0.02) !important; }}
     </style>
