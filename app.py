@@ -69,32 +69,94 @@ def compare(actual, predictions):
     return scores
 
 
-
 def render_html_table(actual, predictions, scores):
     names = list(predictions.keys())
-    header_cells = '<th>순위</th><th>실제</th>' + ''.join(f'<th>{n}</th>' for n in names)
+    header_cells = '<th>순위</th><th>실제 순위</th>' + ''.join(f'<th>{n}</th>' for n in names)
 
     rows_html = ''
     for i in range(20):
         rank = i + 1
         act = actual[i]
-        bg = '#f9f9f9' if i % 2 == 0 else '#ffffff'
-        row = f'<td style="background:{bg};text-align:center">{rank}</td>'
-        row += f'<td style="background:{bg}">{act}</td>'
+
+        if rank <= 4:
+            rank_cls = 'rank-ucl'
+        elif rank <= 6:
+            rank_cls = 'rank-euro'
+        elif rank >= 18:
+            rank_cls = 'rank-rel'
+        else:
+            rank_cls = ''
+
+        row = f'<td class="rank-num {rank_cls}">{rank}</td>'
+        row += f'<td class="team-name">{act}</td>'
         for name in names:
             pred = predictions[name][i]
-            color = '#90EE90' if pred == act else '#FFB6B6'
-            row += f'<td style="background:{color}">{pred}</td>'
+            cell_cls = 'hit' if pred == act else 'miss'
+            row += f'<td class="{cell_cls}">{pred}</td>'
         rows_html += f'<tr>{row}</tr>'
 
     return f"""
     <style>
-      .pl-table-wrap {{ overflow-x: auto; -webkit-overflow-scrolling: touch; }}
-      .pl-table {{ border-collapse: collapse; width: 100%; min-width: 320px; font-size: 11px; }}
-      .pl-table th {{ background: #1E3A5F; color: white; padding: 8px 6px; text-align: center; position: sticky; top: 0; }}
-      .pl-table td {{ padding: 6px 8px; border-bottom: 1px solid #ddd; white-space: nowrap; }}
+      .pl-wrap {{
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: rgba(255,255,255,0.02);
+      }}
+      .pl-table {{
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 320px;
+        font-size: 12px;
+        font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      }}
+      .pl-table th {{
+        background: linear-gradient(135deg, #2d0046 0%, #4c1d95 100%);
+        color: rgba(255,255,255,0.85);
+        padding: 12px 10px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 11px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        border-bottom: 1px solid rgba(124,58,237,0.4);
+      }}
+      .pl-table td {{
+        padding: 9px 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        white-space: nowrap;
+        color: rgba(255,255,255,0.75);
+        text-align: center;
+      }}
+      .pl-table tr:last-child td {{ border-bottom: none; }}
+      .pl-table tr:hover td {{ background: rgba(255,255,255,0.03) !important; }}
+      .rank-num {{
+        font-weight: 700;
+        font-size: 11px;
+        color: rgba(255,255,255,0.3) !important;
+        width: 36px;
+      }}
+      .rank-ucl  {{ color: #60a5fa !important; }}
+      .rank-euro {{ color: #fbbf24 !important; }}
+      .rank-rel  {{ color: #f87171 !important; }}
+      .team-name {{
+        font-weight: 600;
+        text-align: left !important;
+        padding-left: 16px !important;
+        color: rgba(255,255,255,0.92) !important;
+      }}
+      .hit {{
+        background: rgba(16,185,129,0.12) !important;
+        color: #34d399 !important;
+        font-weight: 700;
+      }}
+      .miss {{
+        color: rgba(255,255,255,0.28) !important;
+      }}
     </style>
-    <div class="pl-table-wrap">
+    <div class="pl-wrap">
       <table class="pl-table">
         <thead><tr>{header_cells}</tr></thead>
         <tbody>{rows_html}</tbody>
@@ -103,11 +165,62 @@ def render_html_table(actual, predictions, scores):
     """
 
 
-# ── UI ────────────────────────────────────────────────────────
+# ── Page config ───────────────────────────────────────────────
 st.set_page_config(page_title='PL 예측 결과', page_icon='⚽', layout='centered')
-st.title('⚽ 2025-26 프리미어리그 예측 결과')
 
-if st.button('🔄 현재 순위 불러오기', type='primary'):
+st.markdown("""
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  html, body, [class*="css"] {
+    font-family: 'Inter', 'Noto Sans KR', sans-serif;
+  }
+
+  .stApp {
+    background: radial-gradient(ellipse at 20% 0%, #1e0a3c 0%, #0b0b1a 55%, #0a1628 100%);
+  }
+
+  #MainMenu, footer, header { visibility: hidden; }
+
+  .stButton > button {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 10px 22px !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    letter-spacing: 0.3px !important;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.45) !important;
+    transition: all 0.2s ease !important;
+  }
+  .stButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(124,58,237,0.6) !important;
+  }
+
+  hr { border-color: rgba(255,255,255,0.07) !important; margin: 20px 0 !important; }
+
+  .stSpinner > div { border-top-color: #7c3aed !important; }
+  .stAlert { border-radius: 12px !important; }
+</style>
+""", unsafe_allow_html=True)
+
+
+# ── Header ────────────────────────────────────────────────────
+st.markdown("""
+<div style="text-align:center;padding:36px 0 24px">
+  <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:#7c3aed;text-transform:uppercase;margin-bottom:10px">
+    2025–26 SEASON
+  </div>
+  <h1 style="font-size:30px;font-weight:900;color:white;margin:0;letter-spacing:-0.5px;line-height:1.15">
+    ⚽ 프리미어리그<br>순위 예측 대결
+  </h1>
+  <div style="width:44px;height:3px;background:linear-gradient(90deg,#7c3aed,#a855f7);margin:16px auto 0;border-radius:99px"></div>
+</div>
+""", unsafe_allow_html=True)
+
+if st.button('🔄 현재 순위 불러오기'):
     st.cache_data.clear()
 
 with st.spinner('순위 불러오는 중...'):
@@ -119,19 +232,68 @@ with st.spinner('순위 불러오는 중...'):
 
 scores = compare(actual, PREDICTIONS)
 winner = max(scores, key=scores.get)
+sorted_scores = sorted(scores.items(), key=lambda x: -x[1])
 
-# 점수 카드
-cards = ''
-for name, score in scores.items():
-    medal = '🏆 ' if name == winner else ''
-    cards += f'''
-    <div style="flex:1;text-align:center;padding:8px;background:#f0f2f6;border-radius:8px;margin:0 4px">
-      <div style="font-size:12px;color:#555">{medal}{name}</div>
-      <div style="font-size:16px;font-weight:bold">{score}개 적중</div>
-    </div>'''
-st.markdown(f'<div style="display:flex;margin-bottom:12px">{cards}</div>', unsafe_allow_html=True)
 
-st.divider()
+# ── Score cards ───────────────────────────────────────────────
+cards_html = ''
+for i, (name, score) in enumerate(sorted_scores):
+    if i == 0:
+        bg     = 'linear-gradient(135deg, rgba(251,191,36,0.18), rgba(245,158,11,0.08))'
+        border = '1px solid rgba(251,191,36,0.35)'
+        score_color = '#fbbf24'
+        icon   = '🏆<br>'
+    else:
+        bg     = 'rgba(255,255,255,0.04)'
+        border = '1px solid rgba(255,255,255,0.07)'
+        score_color = '#a78bfa'
+        icon   = ''
 
-# 순위 표
+    cards_html += f"""
+    <div style="
+      flex:1;min-width:72px;
+      text-align:center;
+      padding:18px 8px 14px;
+      background:{bg};
+      border:{border};
+      border-radius:16px;
+      backdrop-filter:blur(12px);
+    ">
+      <div style="font-size:18px;line-height:1.2;margin-bottom:4px">{icon}</div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;
+                  color:rgba(255,255,255,0.4);margin-bottom:8px">{name}</div>
+      <div style="font-size:30px;font-weight:900;color:{score_color};line-height:1">{score}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:5px;font-weight:500">적중</div>
+    </div>"""
+
+st.markdown(f"""
+<div style="margin:8px 0 28px">
+  <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+              color:rgba(255,255,255,0.25);margin-bottom:12px;text-align:center">SCOREBOARD</div>
+  <div style="display:flex;gap:8px">{cards_html}</div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("<hr>", unsafe_allow_html=True)
+
+
+# ── Legend ────────────────────────────────────────────────────
+st.markdown("""
+<div style="display:flex;align-items:center;gap:16px;margin:0 0 14px;justify-content:flex-end;flex-wrap:wrap">
+  <div style="display:flex;gap:12px;font-size:11px;color:rgba(255,255,255,0.35);font-weight:500">
+    <span><span style="color:#60a5fa">●</span> UCL</span>
+    <span><span style="color:#fbbf24">●</span> 유로파</span>
+    <span><span style="color:#f87171">●</span> 강등권</span>
+  </div>
+  <div style="display:flex;gap:8px;font-size:11px">
+    <span style="background:rgba(16,185,129,0.15);color:#34d399;
+                 padding:3px 10px;border-radius:6px;font-weight:700">✓ 적중</span>
+    <span style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);
+                 padding:3px 10px;border-radius:6px;font-weight:500">✗ 오답</span>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# ── Table ─────────────────────────────────────────────────────
 st.markdown(render_html_table(actual, PREDICTIONS, scores), unsafe_allow_html=True)
