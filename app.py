@@ -59,7 +59,7 @@ def fetch_actual():
             standings.append((pts, name_ko))
 
     standings.sort(key=lambda x: -x[0])
-    return [team for _, team in standings[:20]]
+    return [(team, int(pts)) for pts, team in standings[:20]]
 
 
 def compare(actual, predictions):
@@ -144,7 +144,7 @@ def render_analysis_html(analysis, winner):
     """
 
 
-def render_html_table(actual, predictions, scores):
+def render_html_table(actual, points, predictions, scores):
     names = list(predictions.keys())
     header_cells = '<th>순위</th><th>실제 순위</th>' + ''.join(f'<th>{n}</th>' for n in names)
 
@@ -162,8 +162,9 @@ def render_html_table(actual, predictions, scores):
         else:
             rank_cls = ''
 
+        pts = points.get(act, '')
         row = f'<td class="rank-num {rank_cls}">{rank}</td>'
-        row += f'<td class="team-name">{act}</td>'
+        row += f'<td class="team-name">{act}<span class="pts-badge">{pts}pts</span></td>'
         for name in names:
             pred = predictions[name][i]
             cell_cls = 'hit' if pred == act else 'miss'
@@ -255,6 +256,13 @@ def render_html_table(actual, predictions, scores):
         text-align: left !important;
         padding-left: 14px !important;
         color: rgba(255,255,255,0.92) !important;
+      }}
+      .pts-badge {{
+        display: block;
+        font-size: 10px;
+        font-weight: 500;
+        color: rgba(255,255,255,0.3);
+        margin-top: 1px;
       }}
       .hit {{
         background: rgba(16,185,129,0.12) !important;
@@ -378,7 +386,9 @@ with col_c:
 
 with st.spinner('순위 불러오는 중...'):
     try:
-        actual = fetch_actual()
+        actual_data = fetch_actual()
+        actual = [t for t, _ in actual_data]
+        points = {t: p for t, p in actual_data}
     except Exception as e:
         st.error(f'순위를 불러오지 못했습니다: {e}')
         st.stop()
@@ -449,7 +459,7 @@ with tab1:
       </div>
     </div>
     """, unsafe_allow_html=True)
-    st.markdown(render_html_table(actual, PREDICTIONS, scores), unsafe_allow_html=True)
+    st.markdown(render_html_table(actual, points, PREDICTIONS, scores), unsafe_allow_html=True)
 
 with tab2:
     st.markdown(render_analysis_html(analysis, winner), unsafe_allow_html=True)
