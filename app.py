@@ -102,13 +102,14 @@ def render_analysis_html(analysis, winner):
           <td style="text-align:left;padding-left:16px;{name_style}">{name}{badge}</td>
           <td style="font-weight:700;color:#e2e8f0;">{a['avg']:.1f}칸</td>
           <td style="text-align:left;padding-left:12px;">
-            <span style="color:rgba(255,255,255,0.85);font-weight:600;">{a['worst_team']}</span>
-            <span style="font-size:11px;color:rgba(255,255,255,0.35);margin:0 4px">·</span>
-            <span style="font-size:11px;color:rgba(255,255,255,0.4);">예측 {a['worst_pred']}위</span>
-            <span style="font-size:11px;color:{dir_color};margin:0 3px">{direction}</span>
-            <span style="font-size:11px;color:rgba(255,255,255,0.4);">실제 {a['worst_actual']}위</span>
-            <span style="font-size:11px;background:rgba(239,68,68,0.15);color:#fca5a5;
-                         padding:1px 6px;border-radius:4px;margin-left:4px">±{a['worst_err']}칸</span>
+            <div style="color:rgba(255,255,255,0.9);font-weight:700;margin-bottom:3px;">{a['worst_team']}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);">
+              예측 {a['worst_pred']}위
+              <span style="color:{dir_color};margin:0 3px">{direction}</span>
+              실제 {a['worst_actual']}위
+              <span style="background:rgba(239,68,68,0.15);color:#fca5a5;
+                           padding:1px 6px;border-radius:4px;margin-left:4px">±{a['worst_err']}칸</span>
+            </div>
           </td>
         </tr>"""
 
