@@ -450,3 +450,14 @@ with tab1:
 
 with tab2:
     st.markdown(render_analysis_html(analysis, winner), unsafe_allow_html=True)
+    st.markdown("""
+    <div style="margin-top:16px;padding:14px 16px;background:rgba(255,255,255,0.03);
+                border-radius:12px;border:1px solid rgba(255,255,255,0.06);">
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);line-height:1.8;">
+        <span style="color:rgba(255,255,255,0.5);font-weight:600;">평균 오차</span>
+        &nbsp;— 20개 팀 각각의 |예측 순위 − 실제 순위| 평균. 낮을수록 전반적으로 근접하게 맞힌 것.<br>
+        <span style="color:rgba(255,255,255,0.5);font-weight:600;">최대 실수</span>
+        &nbsp;— 한 팀에서 예측이 가장 크게 빗나간 경우.
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
