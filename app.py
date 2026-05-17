@@ -238,18 +238,24 @@ st.markdown("""
   .stSpinner > div { border-top-color: #7c3aed !important; }
   .stAlert { border-radius: 12px !important; }
 
-  /* Score grid: 한 줄 → 모바일에서 2열 자동 wrap */
+  /* Score grid: 항상 한 줄 */
   .score-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    display: flex;
+    flex-wrap: nowrap;
     gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .score-grid > div {
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   /* Mobile tweaks */
   @media (max-width: 480px) {
     .pl-header-title { font-size: 22px !important; }
     .pl-header-wrap  { padding: 20px 0 16px !important; }
-    .score-grid { grid-template-columns: repeat(2, 1fr); }
     .stButton > button { width: 100% !important; }
   }
 </style>
