@@ -69,6 +69,79 @@ def compare(actual, predictions):
     return scores
 
 
+def compute_analysis(actual, predictions):
+    actual_rank = {team: i + 1 for i, team in enumerate(actual)}
+    result = {}
+    for name, pred in predictions.items():
+        pred_rank = {team: i + 1 for i, team in enumerate(pred)}
+        errors = [
+            (abs(actual_rank[team] - pred_rank[team]), team, actual_rank[team], pred_rank[team])
+            for team in actual_rank
+            if team in pred_rank
+        ]
+        avg = sum(e[0] for e in errors) / len(errors)
+        worst = max(errors, key=lambda x: x[0])
+        result[name] = {'avg': avg, 'worst_team': worst[1], 'worst_err': worst[0],
+                        'worst_actual': worst[2], 'worst_pred': worst[3]}
+    return result
+
+
+def render_analysis_html(analysis, winner):
+    sorted_names = sorted(analysis, key=lambda n: analysis[n]['avg'])
+    rows = ''
+    for i, name in enumerate(sorted_names):
+        a = analysis[name]
+        is_best = i == 0
+        row_style = 'background:rgba(124,58,237,0.08);' if is_best else ''
+        name_style = 'color:#a78bfa;font-weight:700;' if is_best else 'color:rgba(255,255,255,0.85);font-weight:600;'
+        badge = ' <span style="font-size:10px;background:rgba(124,58,237,0.3);color:#c4b5fd;padding:1px 6px;border-radius:4px;vertical-align:middle">최소</span>' if is_best else ''
+        direction = '▲' if a['worst_pred'] > a['worst_actual'] else '▼'
+        dir_color = '#f87171' if direction == '▲' else '#60a5fa'
+        rows += f"""
+        <tr style="{row_style}">
+          <td style="text-align:left;padding-left:16px;{name_style}">{name}{badge}</td>
+          <td style="font-weight:700;color:#e2e8f0;">{a['avg']:.1f}칸</td>
+          <td style="text-align:left;padding-left:12px;">
+            <span style="color:rgba(255,255,255,0.85);font-weight:600;">{a['worst_team']}</span>
+            <span style="font-size:11px;color:rgba(255,255,255,0.35);margin:0 4px">·</span>
+            <span style="font-size:11px;color:rgba(255,255,255,0.4);">예측 {a['worst_pred']}위</span>
+            <span style="font-size:11px;color:{dir_color};margin:0 3px">{direction}</span>
+            <span style="font-size:11px;color:rgba(255,255,255,0.4);">실제 {a['worst_actual']}위</span>
+            <span style="font-size:11px;background:rgba(239,68,68,0.15);color:#fca5a5;
+                         padding:1px 6px;border-radius:4px;margin-left:4px">±{a['worst_err']}칸</span>
+          </td>
+        </tr>"""
+
+    return f"""
+    <style>
+      .an-wrap {{ border-radius:16px;border:1px solid rgba(255,255,255,0.07);overflow:hidden; }}
+      .an-table {{ border-collapse:collapse;width:100%;font-size:13px;
+                   font-family:'Inter','Noto Sans KR',sans-serif; }}
+      .an-table th {{ background:#2d0046;color:rgba(255,255,255,0.5);padding:11px 12px;
+                      font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+                      border-bottom:1px solid rgba(124,58,237,0.35); }}
+      .an-table th:first-child {{ text-align:left;padding-left:16px; }}
+      .an-table th:last-child  {{ text-align:left;padding-left:12px; }}
+      .an-table td {{ padding:13px 12px;border-bottom:1px solid rgba(255,255,255,0.04);
+                      color:rgba(255,255,255,0.6);text-align:center;white-space:nowrap; }}
+      .an-table tr:last-child td {{ border-bottom:none; }}
+      .an-table tr:hover td {{ background:rgba(255,255,255,0.02) !important; }}
+    </style>
+    <div class="an-wrap">
+      <table class="an-table">
+        <thead>
+          <tr>
+            <th>예측자</th>
+            <th>평균 오차</th>
+            <th>최대 실수</th>
+          </tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
+    </div>
+    """
+
+
 def render_html_table(actual, predictions, scores):
     names = list(predictions.keys())
     header_cells = '<th>순위</th><th>실제 순위</th>' + ''.join(f'<th>{n}</th>' for n in names)
@@ -252,6 +325,27 @@ st.markdown("""
     min-width: 0;
   }
 
+  /* Tabs */
+  .stTabs [data-baseweb="tab-list"] {
+    gap: 4px;
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .stTabs [data-baseweb="tab"] {
+    background: transparent !important;
+    color: rgba(255,255,255,0.35) !important;
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 8px 8px 0 0;
+    padding: 8px 18px;
+  }
+  .stTabs [aria-selected="true"] {
+    background: rgba(124,58,237,0.12) !important;
+    color: #a78bfa !important;
+    border-bottom: 2px solid #7c3aed !important;
+  }
+  .stTabs [data-baseweb="tab-panel"] { padding-top: 20px; }
+
   /* Mobile tweaks */
   @media (max-width: 480px) {
     .pl-header-title { font-size: 22px !important; }
@@ -331,24 +425,27 @@ st.markdown(f"""
 
 st.markdown("<hr>", unsafe_allow_html=True)
 
+analysis = compute_analysis(actual, PREDICTIONS)
 
-# ── Legend ────────────────────────────────────────────────────
-st.markdown("""
-<div style="display:flex;align-items:center;gap:16px;margin:0 0 14px;justify-content:flex-end;flex-wrap:wrap">
-  <div style="display:flex;gap:12px;font-size:11px;color:rgba(255,255,255,0.35);font-weight:500">
-    <span><span style="color:#60a5fa">●</span> UCL</span>
-    <span><span style="color:#fbbf24">●</span> 유로파</span>
-    <span><span style="color:#f87171">●</span> 강등권</span>
-  </div>
-  <div style="display:flex;gap:8px;font-size:11px">
-    <span style="background:rgba(16,185,129,0.15);color:#34d399;
-                 padding:3px 10px;border-radius:6px;font-weight:700">✓ 적중</span>
-    <span style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);
-                 padding:3px 10px;border-radius:6px;font-weight:500">✗ 오답</span>
-  </div>
-</div>
-""", unsafe_allow_html=True)
+tab1, tab2 = st.tabs(['📊 순위 비교', '🔍 상세 분석'])
 
+with tab1:
+    st.markdown("""
+    <div style="display:flex;align-items:center;gap:16px;margin:0 0 14px;justify-content:flex-end;flex-wrap:wrap">
+      <div style="display:flex;gap:12px;font-size:11px;color:rgba(255,255,255,0.35);font-weight:500">
+        <span><span style="color:#60a5fa">●</span> UCL</span>
+        <span><span style="color:#fbbf24">●</span> 유로파</span>
+        <span><span style="color:#f87171">●</span> 강등권</span>
+      </div>
+      <div style="display:flex;gap:8px;font-size:11px">
+        <span style="background:rgba(16,185,129,0.15);color:#34d399;
+                     padding:3px 10px;border-radius:6px;font-weight:700">✓ 적중</span>
+        <span style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);
+                     padding:3px 10px;border-radius:6px;font-weight:500">✗ 오답</span>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown(render_html_table(actual, PREDICTIONS, scores), unsafe_allow_html=True)
 
-# ── Table ─────────────────────────────────────────────────────
-st.markdown(render_html_table(actual, PREDICTIONS, scores), unsafe_allow_html=True)
+with tab2:
+    st.markdown(render_analysis_html(analysis, winner), unsafe_allow_html=True)
