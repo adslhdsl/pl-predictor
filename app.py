@@ -120,9 +120,10 @@ def render_analysis_html(analysis, winner):
                    font-family:'Inter','Noto Sans KR',sans-serif; }}
       .an-table th {{ background:#2d0046;color:rgba(255,255,255,0.5);padding:11px 12px;
                       font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-                      border-bottom:1px solid rgba(124,58,237,0.35); }}
+                      border-bottom:1px solid rgba(124,58,237,0.35);white-space:nowrap; }}
       .an-table th:first-child {{ text-align:left;padding-left:16px; }}
       .an-table th:last-child  {{ text-align:left;padding-left:12px; }}
+      .an-table td:nth-child(2) {{ white-space:nowrap; }}
       .an-table td {{ padding:13px 12px;border-bottom:1px solid rgba(255,255,255,0.04);
                       color:rgba(255,255,255,0.6);text-align:center;white-space:nowrap; }}
       .an-table td:last-child {{ white-space:normal;word-break:keep-all;line-height:1.6; }}
