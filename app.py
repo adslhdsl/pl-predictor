@@ -23,9 +23,9 @@ TEAM_NAME_KO = {
     'Crystal Palace': '크리스탈팰리스',
     'Nottingham Forest': '노팅엄',
     'Tottenham Hotspur': '토트넘',
-    'West Ham United': '웨스트햄',
-    'Burnley': '번리',
-    'Wolverhampton Wanderers': '울버햄튼',
+    'Hull City': '헐시티',
+    'Ipswich Town': '입스위치',
+    'Coventry City': '코번트리',
 }
 
 def load_predictions():
@@ -56,10 +56,11 @@ def fetch_actual():
             name_en = entry["team"]["displayName"]
             name_ko = TEAM_NAME_KO.get(name_en, name_en)
             pts = next(s["value"] for s in entry["stats"] if s["name"] == "points")
-            standings.append((pts, name_ko))
+            rank = next(s["value"] for s in entry["stats"] if s["name"] == "rank")
+            standings.append((rank, pts, name_ko))
 
-    standings.sort(key=lambda x: -x[0])
-    return [(team, int(pts)) for pts, team in standings[:20]]
+    standings.sort(key=lambda x: x[0])
+    return [(team, int(pts)) for rank, pts, team in standings[:20]]
 
 
 def compare(actual, predictions):
@@ -67,6 +68,29 @@ def compare(actual, predictions):
     for name, pred in predictions.items():
         scores[name] = sum(1 for i in range(20) if pred[i] == actual[i])
     return scores
+
+
+def rank_with_ties(sorted_scores):
+    """
+    표준 경쟁 순위(competition ranking) 방식으로 순위를 매김.
+    예: 12, 12, 10, 9 -> 1위, 1위, 3위, 4위 (동점자 다음 순위는 인원수만큼 건너뜀)
+
+    Returns:
+        ranks: sorted_scores와 같은 순서의 순위 리스트
+        rank_counts: {순위: 해당 순위를 공유하는 인원 수}
+    """
+    ranks = []
+    for i, (name, score) in enumerate(sorted_scores):
+        if i > 0 and score == sorted_scores[i - 1][1]:
+            ranks.append(ranks[-1])
+        else:
+            ranks.append(i + 1)
+
+    rank_counts = {}
+    for r in ranks:
+        rank_counts[r] = rank_counts.get(r, 0) + 1
+
+    return ranks, rank_counts
 
 
 def compute_analysis(actual, predictions):
@@ -86,7 +110,7 @@ def compute_analysis(actual, predictions):
     return result
 
 
-def render_analysis_html(analysis, winner):
+def render_analysis_html(analysis, winners):
     sorted_names = sorted(analysis, key=lambda n: analysis[n]['avg'])
     rows = ''
     for i, name in enumerate(sorted_names):
@@ -403,14 +427,20 @@ with st.spinner('순위 불러오는 중...'):
         st.stop()
 
 scores = compare(actual, PREDICTIONS)
-winner = max(scores, key=scores.get)
 sorted_scores = sorted(scores.items(), key=lambda x: -x[1])
+ranks, rank_counts = rank_with_ties(sorted_scores)
+winners = [name for name, rank in zip([n for n, _ in sorted_scores], ranks) if rank == 1]
 
 
 # ── Score cards ───────────────────────────────────────────────
 cards_html = ''
 for i, (name, score) in enumerate(sorted_scores):
-    if i == 0:
+    rank = ranks[i]
+    is_top = rank == 1
+    tied = rank_counts[rank] > 1
+    rank_label = f'공동 {rank}위' if tied else f'{rank}위'
+
+    if is_top:
         bg     = 'linear-gradient(135deg, rgba(251,191,36,0.18), rgba(245,158,11,0.08))'
         border = '1px solid rgba(251,191,36,0.35)'
         score_color = '#fbbf24'
@@ -432,6 +462,7 @@ for i, (name, score) in enumerate(sorted_scores):
       backdrop-filter:blur(12px);
     ">
       <div style="font-size:18px;line-height:1.2;margin-bottom:4px">{icon}</div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:0.5px;color:rgba(255,255,255,0.35);margin-bottom:3px">{rank_label}</div>
       <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;
                   color:rgba(255,255,255,0.4);margin-bottom:8px">{name}</div>
       <div style="font-size:30px;font-weight:900;color:{score_color};line-height:1">{score}</div>
@@ -471,7 +502,7 @@ with tab1:
     st.markdown(render_html_table(actual, points, PREDICTIONS, scores), unsafe_allow_html=True)
 
 with tab2:
-    st.markdown(render_analysis_html(analysis, winner), unsafe_allow_html=True)
+    st.markdown(render_analysis_html(analysis, winners), unsafe_allow_html=True)
     st.markdown("""
     <div style="margin-top:16px;padding:14px 16px;background:rgba(255,255,255,0.03);
                 border-radius:12px;border:1px solid rgba(255,255,255,0.06);">
