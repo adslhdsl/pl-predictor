@@ -400,7 +400,7 @@ st.markdown("""
 st.markdown("""
 <div style="text-align:center;padding:8px 0 20px">
   <div style="font-size:10px;font-weight:700;letter-spacing:5px;color:#7c3aed;text-transform:uppercase;margin-bottom:6px">
-    2025–26 Season
+    2026–27 Season
   </div>
   <div style="font-size:24px;font-weight:600;letter-spacing:6px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:8px">
     Premier League
